@@ -1,0 +1,10 @@
+# Python caches
+__pycache__/
+*.pyc
+
+# Local environments
+.venv/
+env/
+
+# MediaPipe / YOLO downloaded asset weights
+*.pt
