@@ -25,6 +25,8 @@ The system operates through three primary layers:
 ### Software
 *   **Python 3.10+**
 *   **Arduino IDE** (for uploading the firmware)
+*   **Arduino Libraries:**
+    *   `LiquidCrystal`: For controlling the 16x2 LCD display.
 *   **Python Libraries:**
     *   `opencv-python`: For video capture and UI rendering.
     *   `mediapipe`: For high-fidelity pose estimation.
