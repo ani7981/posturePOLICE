@@ -41,6 +41,22 @@ def download_model_if_missing():
             raise
     return MODEL_PATH
 
+def find_working_camera():
+    """
+    Attempts to find the first working camera index.
+    Iterates through common indices to avoid inactive virtual cameras.
+    """
+    for index in [1, 0, 2]:
+        cap = cv2.VideoCapture(index)
+        if cap.isOpened():
+            ret, frame = cap.read()
+            if ret:
+                print(f"Using camera at index: {index}")
+                cap.release()
+                return index
+            cap.release()
+    return 0  # Fallback to 0 if none found working
+
 def main():
     # Download required model asset
     model_path = download_model_if_missing()
@@ -61,7 +77,8 @@ def main():
     )
 
     # Initialize Video Capture
-    cap = cv2.VideoCapture(0)
+    camera_index = find_working_camera()
+    cap = cv2.VideoCapture(camera_index)
 
     # Calibration baselines
     baseline_eyes_y = None
@@ -170,12 +187,15 @@ def main():
                         color = (0, 255, 0) # Green (BGR)
 
                     # Serial Communication logic
+                    # Continuous transmission as requested: sends state every frame
                     current_state = b'B' if is_bad_posture else b'G'
-                    if ser and current_state != last_sent_state:
+                    if ser:
                         try:
                             ser.write(current_state)
-                            last_sent_state = current_state
-                            print(f"Sent signal over serial: {current_state}")
+                            # Log only on state change to avoid console spam, but send every frame
+                            if current_state != last_sent_state:
+                                print(f"State changed: {current_state.decode()}")
+                                last_sent_state = current_state
                         except Exception as e:
                             print(f"Serial write error: {e}")
 
